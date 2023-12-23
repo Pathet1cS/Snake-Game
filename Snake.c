@@ -37,7 +37,7 @@ void inputName();
 void input();
 void draw();
 void setup();
-void loadHighScoresFromFile();
+void loadHighScore();
 void saveHighScore();
  
 
@@ -59,8 +59,7 @@ int main() {
             	}
             	np.npscore = score;
             	system("cls");
-            	printf("SCORE: %d\n", score);
-            	loadHighScoresFromFile();
+            	loadHighScore();
             	do {
             		printf("Please choose between 1-5: ");
             		scanf("%d", &choice); getchar;
@@ -70,14 +69,14 @@ int main() {
             	break;
 
         	case 2:
-            	loadHighScoresFromFile();
+            	loadHighScore();
         		printf("Press enter to return to the menu...");
         		getch();
         		system("cls");
             	break;
 
         	case 3:
-            	printf("Goodbye...\n");
+            	printf("Goodbye... ^.^\n");
             	break;
 
         	default:
@@ -106,20 +105,35 @@ void saveHighScore(){
     fclose(file);
 }
 
-void loadHighScoresFromFile() {
+void loadHighScore() {
     FILE *file = fopen("highscores.txt", "r");
-	
-	if(file == NULL){
-		printf("File tidak ditemukan\n");
-	}
-	
-	printf("============ LEADERBOARD ============\n");
-	for(i=0;i<5;i++){
-		fscanf(file, "%s %d", p[i].pnama, &p[i].pscore);
-		printf("%d. %s\t%d\n", i+1, p[i].pnama, p[i].pscore);
-	}
-	printf("======================================\n");
-	fclose(file);
+
+    if (file == NULL) {
+        printf("File not found\n");
+        return;
+    }
+
+    for (i=0; i<5; i++) {
+        fscanf(file, "%s %d", p[i].pnama, &p[i].pscore);
+    }
+
+    for (i=0; i<4; i++) {
+        for (j=0; j<4-i; j++) {
+            if (p[j].pscore < p[j + 1].pscore) {
+                struct player temp = p[j];
+                p[j] = p[j + 1];
+                p[j + 1] = temp;
+            }
+        }
+    }
+
+    printf("============ LEADERBOARD ============\n");
+    for (i=0; i<5; i++) {
+        printf("%d. %s\t%d\n", i + 1, p[i].pnama, p[i].pscore);
+    }
+    printf("======================================\n");
+
+    fclose(file);
 }
 
 void setup() {
@@ -271,4 +285,3 @@ int splash() {
 
     return choice;
 }
-
